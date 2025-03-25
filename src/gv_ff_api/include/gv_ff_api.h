@@ -7,6 +7,9 @@
 #include <spdlog/spdlog.h>
 #include <fmt/core.h>
 
+namespace gv
+{
+
 /**
  * @brief Initialization of whole library
  * @attention this function must be called before any other function
@@ -23,5 +26,7 @@ void ff_api_shutdown();
 void ff_api_version(char* pVersion);
 
 void ff_api_command();
+
+}
 
 #endif  // FF_API_H_
