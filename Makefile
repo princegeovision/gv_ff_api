@@ -11,9 +11,11 @@ buildv:
 	cmake --build build
 
 #-
+# (Ninja) ./build/app_src/gv_ff_app
+# (Xcode) ./build/app_src/Debug/gv_ff_app
 .PHONY: run
 run:
-	./build/app_src/gv_ff_app
+	./build/app_src/Debug/gv_ff_app
 	
 #- clean for macOS
 #-
