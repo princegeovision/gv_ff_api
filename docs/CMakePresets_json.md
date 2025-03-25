@@ -6,6 +6,22 @@
 
 ### JSON-Xcode
 
+```json
+{
+    "version": 2,
+    "configurePresets": [
+      {
+        "name": "vcpkg",
+        "generator": "Xcode",
+        "binaryDir": "${sourceDir}/build",
+        "cacheVariables": {
+          "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        }
+      }
+    ]
+}
+```
+
 ### JSON-Ninja
 ```json
 {
