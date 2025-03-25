@@ -1,0 +1,17 @@
+{
+    "dependencies": [
+      "ffmpeg",
+      "fmt"
+    ],
+    "overrides": [
+      {
+        "name": "fmt",
+        "version": "11.0.2"
+      },
+      {
+        "name": "ffmpeg",
+        "version": "4.4.3#3"
+      }
+    ]
+  }
+  

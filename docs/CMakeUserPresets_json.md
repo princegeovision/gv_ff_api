@@ -1,0 +1,22 @@
+# JSON File
+
+## Intro
+
+- collection of JSON Files
+
+### EX-1
+
+```json
+{
+    "version": 2,
+    "configurePresets": [
+      {
+        "name": "default",
+        "inherits": "vcpkg",
+        "environment": {
+          "VCPKG_ROOT": "/Users/geovision/Documents/GitHub/vcpkg"
+        }
+      }
+    ]
+}
+```
