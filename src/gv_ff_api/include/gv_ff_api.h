@@ -7,6 +7,8 @@
 #include <spdlog/spdlog.h>
 #include <fmt/core.h>
 
+#include "ff_decoder.h"
+
 namespace gv
 {
 
