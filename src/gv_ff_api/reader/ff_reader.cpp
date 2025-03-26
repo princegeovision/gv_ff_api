@@ -2,9 +2,11 @@
 
 #include "ff_reader.h"
 
+#include "ff_reader_internal.h"
 
 namespace gv
 {
+    bool reader_logger_ = false;//25 items
     void ff_reader_version(char* pVersion)    
     {
         spdlog::info("[ff-reader]version: {}", "1.0.0");
@@ -29,22 +31,25 @@ namespace gv
         //ffmpeg 4.4, no need to call this.
         //av_register_all();
     }
-    // bool ff_decoder_init()
-    // {
-    //     spdlog::info("[ff-decoder]init>>");
-    //     std::unique_lock<std::mutex> lock(g_ffmpeg_mutex);
-    //     if (!g_avcodec_registed)
-    //     {
-    //         //av_register_all();// (use in reader) //has been deprecated in ffmpeg 4.0
-    //         avcodec_register_all();
-    //         g_avcodec_registed = true;
-    //     }
-
-    //     spdlog::info("[ff-decoder]init<<");
-    //     return false;
-    // }
-    // void ff_decoder_shutdown()
-    // {
-    //     spdlog::info("[ff-decoder]shutdown>><<");
-    // }
+    void ff_reader_release(ffReader** reader)
+    {
+        if (*reader)
+        {
+            avformat_network_deinit();
+            
+            ffInternalReader* interal = (*reader)->internal;
+            
+            avcodec_close(interal->codec_ctx);
+            avcodec_close(interal->codec_ctx_audio);
+            
+            avformat_flush(interal->format_ctx);
+            avformat_close_input(&interal->format_ctx);
+            
+            delete interal;
+            free(*reader);
+            
+            *reader = nullptr;
+            if(reader_logger_){FF_RELEASE_MSG("[RTSP] release success!!\n");}
+        }
+    }
 }

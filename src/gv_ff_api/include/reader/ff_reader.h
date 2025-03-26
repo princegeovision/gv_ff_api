@@ -32,7 +32,8 @@ extern "C"
 #include <CoreVideo/CVPixelBuffer.h>
 #endif  // #if GEO_PLATFORM == GEO_PLATFORM_APPLE
 
-#include "ff_decoder_type.h"
+//#include "ff_decoder_type.h"
+#include "ff_reader_type.h"
 //-- 
 
 namespace gv
@@ -41,8 +42,8 @@ namespace gv
 void ff_reader_version(char* pVersion);
 void ff_reader_prepare();
 
-//bool ff_decoder_init();
-//void ff_decoder_shutdown();
+
+void ff_reader_release(ffReader** reader);
 
 
 }
