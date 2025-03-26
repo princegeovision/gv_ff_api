@@ -1,7 +1,8 @@
 # Add Lib
 add_library(gv_ff_api 
     STATIC
-    gv_ff_api.cpp)
+    gv_ff_api.cpp
+    decoder/ff_decoder.cpp)
 # ff_decoder.cc
 
 # M2-1-B
@@ -28,3 +29,4 @@ target_link_libraries(gv_ff_api
 # Header client find header file
 # org target_include_directories(pg_client PUBLIC "./")
 target_include_directories(gv_ff_api PUBLIC "./include")
+target_include_directories(gv_ff_api PUBLIC "./include/decoder")
