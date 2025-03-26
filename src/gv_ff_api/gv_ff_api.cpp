@@ -20,7 +20,7 @@ namespace gv
     
     void ff_api_version(char* pVersion)
     {
-        spdlog::info("[ff]version: {}", "0.1.0");
+        spdlog::info("[ff]version: {}", "0.2.0");
     }
     
     void ff_api_command()
