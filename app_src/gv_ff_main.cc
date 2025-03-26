@@ -8,7 +8,8 @@ void check_version()
     gv::ff_api_version(&tVersion[0]);
     char tDecoderVersion[64] = {0};
     gv::ff_decoder_version(&tDecoderVersion[0]);
-    
+    char tReaderVersion[64] = {0};
+    gv::ff_reader_version(&tReaderVersion[0]);
 }
 
 int

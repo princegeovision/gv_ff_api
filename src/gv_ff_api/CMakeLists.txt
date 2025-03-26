@@ -2,6 +2,7 @@
 add_library(gv_ff_api 
     STATIC
     gv_ff_api.cpp
+    reader/ff_reader.cpp
     decoder/ff_decoder.cpp)
 # ff_decoder.cc
 
@@ -30,3 +31,4 @@ target_link_libraries(gv_ff_api
 # org target_include_directories(pg_client PUBLIC "./")
 target_include_directories(gv_ff_api PUBLIC "./include")
 target_include_directories(gv_ff_api PUBLIC "./include/decoder")
+target_include_directories(gv_ff_api PUBLIC "./include/reader")
