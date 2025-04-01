@@ -9,3 +9,4 @@
 
 - 1.0.0 : Initial commit
 - 1.1.0 : Add Create and Release function to API.
+- 1.2.0 : add start_action.
