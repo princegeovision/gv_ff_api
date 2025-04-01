@@ -30,7 +30,6 @@ namespace gv
             avcodec_register_all();
             g_avcodec_registed = true;
         }
-
         spdlog::info("[ff-decoder]init<<");
         return false;
     }

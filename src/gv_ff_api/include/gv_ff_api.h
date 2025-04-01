@@ -8,6 +8,7 @@
 #include <fmt/core.h>
 
 #include "ff_decoder.h"
+#include "ff_reader.h"
 
 namespace gv
 {
