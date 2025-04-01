@@ -16,7 +16,7 @@ namespace gv
 
     void ff_reader_version(char* pVersion)
     {
-        spdlog::info("[ff-reader]version: {}", "1.0.0");
+        spdlog::info("[ff-reader]version: {}", "1.1.0");
         unsigned codecVer = avcodec_version();//"4.4.3#3"
         int ver_major,ver_minor,ver_micro;
         ver_major = (codecVer>>16)&0xff;    //58
