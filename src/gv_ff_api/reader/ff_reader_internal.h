@@ -72,5 +72,7 @@ typedef struct ffInternalReader
     bool                        first_iframe;
 } ffInternalReader;
 
+//Internal-Functions DEF
+//char* make_url_link(ffReaderConnectionInfo &urlparams, char* outputBuffer);
 
 #endif  // FF_READER_INTERNAL_H_

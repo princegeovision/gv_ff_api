@@ -40,7 +40,9 @@ namespace gv
 {
 
 void ff_reader_version(char* pVersion);
-void ff_reader_prepare();
+//bool ff_reader_prepare();
+
+ffReader* ff_reader_create(ffReaderConnectionInfo* inputInfo);
 
 
 void ff_reader_release(ffReader** reader);

@@ -20,6 +20,14 @@ enum ff_reader_transport_type
     k_ff_reader_transport_type_unknown  = 3
 };
 
+enum ff_reader_callback_type
+{
+    k_ff_reader_callback_type_event_login_result = 1,
+    k_ff_reader_callback_type_event_data = 2,
+    k_ff_reader_callback_type_video_data = 3,
+    k_ff_reader_callback_type_audio_data = 4
+};
+
 enum ff_reader_frame_status
 {
     k_ff_reader_reader_yet_ready = 0,
@@ -95,6 +103,8 @@ typedef struct ffRtspReaderEventInfo
     int read_eof;  // true mean read end, release this connection.
 } ffRtspReaderEventInfo;
 
+//When Callback Type
+// - k_ff_reader_callback_type_event_login_result
 typedef struct ffRtspReaderLoginResult
 {
     int connect_result;     // ref: gvRtspConnectResult
@@ -102,22 +112,27 @@ typedef struct ffRtspReaderLoginResult
     int audio_streaming_count;
 } ffRtspReaderLoginResult;
 
-typedef struct ffRtspConnectionInfo
-{
-    int     connection_type; /*!<  ref: gvRtspReaderTransportType */
-    char    domain_name[512];     /*!<  ref: xxx.xxx.xxx.xxx ipv4*/
-    char    username[512];        /*!<  user name*/
-    char    password[512];        /*!<  password*/
-    char    port[16];            /*!<  ip port*/
-    char    path[1024];            /*!<  ref: xxx.sdp (file path)*/
-    int     camera_index;    /*!<  *///->This is not in use (should remove)
-} ffRtspConnectionInfo;
-
 //typedef void(*gv_rtsp_reader_video_callback)(const gvRtspReaderVideoInfo* video,void* user_info);
 //typedef void(*gv_rtsp_reader_audio_callback)(const gvRtspReaderAudioInfo* audio,void* user_info);
 //typedef void(*gv_rtsp_reader_event_callback)(const gvRtspReaderEventInfo* event,void* user_info);
 //typedef void(*gv_rtsp_reader_loginresult_callback)(const gvRtspReaderLoginResult* result,void* user_info);
 typedef int(*ff_reader_type_callback)(const int cbType, const void* pData, void* user_info);
+
+typedef struct ffReaderConnectionInfo
+{
+    int     connection_type; /*!<  ref: ff_reader_transport_type */
+    char    domain_name[512];     /*!<  ref: xxx.xxx.xxx.xxx ipv4*/
+    char    username[512];        /*!<  user name*/
+    char    password[512];        /*!<  password*/
+    char    port[16];            /*!<  ip port*/
+    char    path[1024];            /*!<  ref: xxx.sdp (file path)*/
+
+    //Callback Related
+    ff_reader_type_callback reader_cb;
+    void*                   reader_cb_user_arg;
+} ffReaderConnectionInfo;
+
+
 
 //Reader
 typedef struct ffReader
