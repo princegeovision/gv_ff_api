@@ -53,11 +53,79 @@ enum ff_reader_connect_result {
     k_ff_reader_cr_by_pass = -3
 };
 
+typedef enum audio_compress_codec /* For VIDEO_STREAM_SETTINGS */
+{
+    EN_AC_PCM         = 0,
+    EN_AC_MS_ADPCM    = 1,
+    EN_AC_INTEL_ADPCM = 2,
+    EN_AC_MP1         = 3,
+    EN_AC_MP2         = 4, /* mpeg-1 layer 2 */
+    EN_AC_MP3         = 5,
+    EN_AC_MP4_AAC     = 6,  //AAC 單聲道
+    EN_AC_G711        = 7,
+    EN_AC_G723        = 8,
+    EN_AC_G726        = 9,      //Sony G.726
+    EN_AC_G721        = 10,
+    EN_AC_G723_1      = 11,      //G723.1
+    EN_RTSP_MEDIA_AMR_WB =12,    // AMR audio (wideband)
+    EN_RTSP_MEDIA_AMR =13,       // AMR audio (narrowband)
+    EN_AC_G711_ALAW    =14,       // G711 a-law audio
+    EN_AC_MP4_AAC_2CH  = 15,  //AAC 雙聲道
+} AUDIO_COMPRESS_CODEC;
+
+enum ffRtspReaderAudioFormat
+{
+    AF_8K_8b    = 1,                         //64Kbps
+    AF_32K_8b   = 2,
+    AF_44K_8b   = 3,
+    AF_48K_8b   = 4,
+    AF_8K_3b    = 5,                         //24Kbps , Solo Video Server
+    AF_32K_16b  = 6,
+    AF_44K_16b  = 7,
+    AF_48K_16b  = 8,
+
+    AF_8K_4b    = 9,                         //32Kbps
+    AF_8K_5b    = 10,                        //40Kbps
+    AF_8K_6b    = 11,                        //48Kbps
+    AF_8K_7b    = 12,                           //56Kbps
+    AF_8K_2b    = 13,                           //16Kbps
+    AF_8K_16b   = 14,
+    AF_16K_8b   = 15,
+    AF_16K_16b  = 16,
+
+    AF_44K_8b_2H    = 17,                //2 channel
+    AF_44K_16b_2H   = 18,                //2 channel
+    AF_16K_8b_2H    = 19,                //2 channel
+    AF_16K_16b_2H   = 20,                //2 channel
+    AF_8K_8b_2H     = 21,                 //2 channel
+    AF_8K_16b_2H    = 22,                 //2 channel
+    AF_8K_3b_2H     = 23,                 //2 channel
+    AF_32K_16b_2H   = 24,
+    AF_24K_16b      = 25,                //2012.6.22 支援24K,16bit,1 channel
+};
+
 typedef enum ff_reader_rtsp_error_code {
     k_ff_reader_rtsp_err_ok = 0,
     k_ff_reader_rtsp_err_fail = -1,
     k_ff_reader_rtsp_err_internal = -2
 } RTSPERRCode;
+
+enum ff_reader_action_type
+{
+    k_ff_reader_action_type_unknown             = 0,
+    k_ff_reader_action_type_start               = 100,
+    k_ff_reader_action_type_stop                = 101,
+    k_ff_reader_action_type_callback_audio      = 102,
+    k_ff_reader_action_type_bypass_audio        = 103,  //Default is filtered
+    k_ff_reader_action_type_debug_mode          = 104,
+};
+
+enum ff_reader_action_result
+{
+    k_ff_reader_action_result_ok = 0,
+    k_ff_reader_action_result_fail = 10
+    //k_ff_reader_action_result_start_fail = 11,
+};
 
 //This should be class for RAII Reason.
 typedef struct ffReaderVideoInfo
@@ -98,6 +166,8 @@ typedef struct ffRtspReaderAudioInfo
     double      total_duration;
 } ffRtspReaderAudioInfo;
 
+//When Callback Type
+// - k_ff_reader_callback_type_event_data
 typedef struct ffRtspReaderEventInfo
 {
     int read_eof;  // true mean read end, release this connection.
@@ -132,7 +202,13 @@ typedef struct ffReaderConnectionInfo
     void*                   reader_cb_user_arg;
 } ffReaderConnectionInfo;
 
-
+typedef struct ff_reader_action_info
+{
+    enum ff_reader_action_type  action_type;
+    bool                        b_flag;
+    int32_t                     n_value;
+    const char*                 s_detail;
+} ff_reader_action_info;
 
 //Reader
 typedef struct ffReader

@@ -44,9 +44,9 @@ void ff_reader_version(char* pVersion);
 
 ffReader* ff_reader_create(ffReaderConnectionInfo* inputInfo);
 
-
 void ff_reader_release(ffReader** reader);
 
+int ff_reader_action(ffReader* reader, ff_reader_action_info action_info);
 
 }
 

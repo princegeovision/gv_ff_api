@@ -19,7 +19,35 @@ void check_version()
 int reader_callback(const int cbType, const void* pData, void* user_info)
 {
     //
-    spdlog::info("[ff]reader_callback>> (cbType=%d", cbType);
+    spdlog::info("[ff]reader_callback>> (cbType={}", cbType);
+    switch (cbType) {
+        case k_ff_reader_callback_type_video_data:
+        {
+            ffReaderVideoInfo* videoInfo = (ffReaderVideoInfo*)pData;
+            spdlog::info("[V]-{} x {}", videoInfo->width, videoInfo->height);
+        }
+            break;
+        case k_ff_reader_callback_type_audio_data:
+        {
+            ffRtspReaderAudioInfo* audioInfo = (ffRtspReaderAudioInfo*)pData;
+            spdlog::info("[A]-{} x {}", audioInfo->raw_data_size, audioInfo->sample_rate);
+        }
+            break;
+        case k_ff_reader_callback_type_event_data:
+        {
+            ffRtspReaderEventInfo* eventInfo = (ffRtspReaderEventInfo*)pData;
+            spdlog::info("[E]EOF-{}", eventInfo->read_eof);
+        }
+            break;
+        case k_ff_reader_callback_type_event_login_result:
+        {
+            ffRtspReaderLoginResult* loginResult = (ffRtspReaderLoginResult*)pData;
+            spdlog::info("[E]connect_result={}", loginResult->connect_result);
+        }
+            break;
+        default:
+            break;
+    }
     spdlog::info("[ff]reader_callback<<");
 }
 
@@ -88,15 +116,24 @@ void run_reader()
     pReader = gv::ff_reader_create(&info);
 
 
-//    bool bReading = true;
-//    while(bReading){
-//        if((pReader != nullptr)&&(bStartReading == false))
-//        {
-//            //command to start READing.
-//        }
-//        sleep(100);
-//        //check reading result
-//    }
+    bool bReading = true;
+    while(bReading){
+        if((pReader != nullptr)&&(bStartReading == false))
+        {
+            //command to start READing.
+            ff_reader_action_info action_info;
+            memset(&action_info, 0, sizeof(action_info));
+            action_info.action_type = k_ff_reader_action_type_start;
+            int action_result = gv::ff_reader_action(pReader, action_info);
+            if(action_result == k_ff_reader_action_result_fail){
+                spdlog::info("[ff-reader]action_type_start -- FAIL");
+            } else if(action_result == k_ff_reader_action_result_ok){
+                spdlog::info("[ff-reader]action_type_start -- OK");
+            }
+        }
+        sleep(1000*100);
+        //check reading result
+    }
     //After read finished
     gv::ff_reader_release(&pReader);
 
