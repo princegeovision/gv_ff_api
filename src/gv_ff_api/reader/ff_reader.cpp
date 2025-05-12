@@ -318,8 +318,9 @@ namespace gv
                 if(reader_logger_){spdlog::info("[RTSP] Reader_TimeFunc=%lld\n", ms);}
             } else {
                 //REF: gvRtspReadFrameStatus
+                //return 0 = false, return 1 = true, restun 2 = skip
                 got_frame_value = rtsp_get_next_frame(reader, frame);
-                if(reader_logger_){spdlog::info("[RTSP] No TS\n");}
+                if(reader_logger_){spdlog::info("[RTSP] No Estimate TS(got_frame_value={})\n", got_frame_value);}
             }
 
         } while (!internal->request_stop_read_ && (should_continue == true));

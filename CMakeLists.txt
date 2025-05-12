@@ -8,7 +8,8 @@ set(CXX_STANDARD_REQUIRED ON) #Make C++20 a hard requirement
 set(CMAKE_CXX_STANDARD 11) # Default C++ standard for targets
 set(CMAKE_C_STANDARD 99)
 
-# Dependency
+# << vcpkg >>
+# Dependency fmt
 find_package(fmt CONFIG REQUIRED)
 
 # Compile lib

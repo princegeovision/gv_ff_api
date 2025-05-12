@@ -50,7 +50,7 @@ int reader_callback(const int cbType, const void* pData, void* user_info)
     }
     spdlog::info("[ff]reader_callback<<");
 }
-
+//Utils-Func
 std::string charToHex(unsigned char c) {
     short i = c;
 
@@ -60,7 +60,7 @@ std::string charToHex(unsigned char c) {
 
     return s.str();
 }
-
+//Utils-Func
 std::string urlEncode(const std::string &toEncode) {
     std::ostringstream out;
 
