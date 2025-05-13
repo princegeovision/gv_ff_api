@@ -5,6 +5,7 @@
 - This is Documentation for File Handler
 - We Design File handler to help other components provide callback with data , that can save in a file for future use.
 - This principle will help us to pipeline multiple command work together in the future.
+- Related: [ff_stream_files](./about_ff_stream_files.md)
 
 ### File Handler
 

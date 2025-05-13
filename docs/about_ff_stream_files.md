@@ -1,0 +1,23 @@
+# About ff Stream Files
+
+## Intro
+
+- This is Documentation for Stream file
+- Related:[File handler](./about_file_handler.md)
+
+### Design
+
+#### ChatGPT-Note:
+
+- We use "Strategy" Design Pattern to help organize code into function feature list
+  - create, write, open, muxer, play in stream_manager
+  - stream_manager has 2 file_object (A/V)
+  - stream_manager has 1 handlerStrategy
+  - <注意設計> Function的前提條件，讓 operation 安全可用
+- Inheriting behavior, which means strategy classes are coupled — this is slightly different from a typical Strategy Pattern where strategies are interchangeable. If you're okay with coupling and step-wise processing, this works well.
+
+#### Previous-Experience
+
+- Good decople design , can help us reuse class, instead of re-assemble
+- ME: 單元應該可以被操作，達成不同功能。而非像是，根據舊元件樣貌，打造新 class 達到同樣資料的不同作用
+  - EX: stream_file_object_manager , download_file_handler
