@@ -27,6 +27,12 @@ typedef enum ff_file_handler_open_status_code {
     k_ff_file_handler_create_s_fail_no_p = -2
 } FHStatusCode;
 
+enum ff_file_handler_action_type
+{
+    k_ff_file_handler_action_type_unknown             = 0,
+    k_ff_file_handler_action_type_write               = 100,
+    k_ff_file_handler_action_type_read                = 101,
+};
 
 // << Callback DEF >>
 typedef int(*ff_file_handler_type_callback)(const int cbType, const void* pData, void* user_info);
@@ -37,7 +43,7 @@ typedef struct ffFileHandlerInfo
     
     char    file_name[512];     /*!<  ref: xxx.xxx.xxx.xxx ipv4*/
     char    file_path[1024];    /*!<  ref: xxx.sdp (file path)*/
-    int64_t file_stream_id;
+    //int64_t file_stream_id;     //pre-define, if library can respect this?
     
     //Callback Related
     ff_file_handler_type_callback   fh_cb;
@@ -51,12 +57,19 @@ typedef struct ffFileHandlerInfo
 //     int32_t                     n_value;
 //     const char*                 s_detail;
 // } ff_reader_action_info;
+typedef struct ff_file_handler_action_info
+{
+    enum ff_file_handler_action_type    action_type;
+    bool                                b_flag;
+    int32_t                             n_value;
+    const char*                         s_detail;
+} ff_file_handler_action_info;
 
 //Reader
 typedef struct ffFileHandler
 {
     struct ffInternalfh* internal;
-    
+    int32_t file_stream_id;
     ff_file_handler_type_callback type_callback;
     bool check_audio_exsit_flag;
     void* user_arg;

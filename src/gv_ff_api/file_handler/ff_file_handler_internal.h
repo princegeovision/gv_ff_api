@@ -16,6 +16,7 @@ typedef unsigned int        DWORD;
 // }
 // ---
 #include <thread>
+#include "stream_file_mgr.hpp"
 
 //REF: ffInternalReader
 typedef struct ffInternalfh
@@ -23,7 +24,9 @@ typedef struct ffInternalfh
     //Note: We need to use as
     //- stream_muxer
     //- stream_player
-
+    //gv::stream_file_mgr m_fmgr;
+    gv::stream_file_mgr* p_fmgr;
+    //stream_file_mgr m_fmgr;
 
     int32_t stream_user_type;
 

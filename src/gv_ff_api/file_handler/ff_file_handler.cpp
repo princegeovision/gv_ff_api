@@ -39,6 +39,46 @@ namespace gv
         //01-
         spdlog::info("[ff-fh]setup_file_object>>");
         //ffFileHandler
+        //display inputInfo
+        spdlog::info("[ff-fh]inputInfo: Type:{}", inputInfo->fh_create_type);
+        spdlog::info("[ff-fh]inputInfo: file_path:{}", inputInfo->file_path);
+        spdlog::info("[ff-fh]inputInfo: file_name:{}", inputInfo->file_name);
+        //Check File name is not empty
+        std::string l_file_path = inputInfo->file_path;
+        std::string l_file_name = inputInfo->file_name;
+        if(l_file_name.length() > 0){
+            //Has Name
+            ffFileHandler* handler = (ffFileHandler*)malloc(sizeof(ffFileHandler));
+            if (!handler)
+            {
+                return nullptr;
+            }
+            memset(handler, 0, sizeof(ffFileHandler));
+
+            handler->internal = (ffInternalfh*)malloc(sizeof(ffInternalfh));
+            if (!handler->internal)
+            {
+                free(handler);
+                return nullptr;
+            }
+            gv::stream_file_mgr* stream_mgr = new gv::stream_file_mgr();
+            bool ok = stream_mgr->init(std::string(l_file_name));
+            if (!ok)
+            {
+                delete stream_mgr;
+                free(handler->internal);
+                free(handler);
+
+                return nullptr;
+            }
+            //Before we return to handler, we need to create stream_id for it
+            //file_stream_id
+            handler->internal->p_fmgr = stream_mgr;
+            int32_t fs_id = g_sh_handler.insertToMap(handler);
+            handler->file_stream_id = fs_id;
+            
+            return handler;
+        }
         //產生 ffInternalfh by file_path
         spdlog::info("[ff-fh]setup_file_object<<");
         return nullptr;
@@ -60,20 +100,19 @@ namespace gv
         //REF: void ff_reader_release(ffReader** reader)
         if (*fHandler)
         {
-            // ffInternalReader* interal = (*reader)->internal;
-                        
-            // delete interal;
-            // free(*reader);
-            
-            // *reader = nullptr;
+            ffInternalfh* interal = (*fHandler)->internal;
+
+            delete interal;
+            free(*fHandler);
+            *fHandler = nullptr;
             //FF_RELEASE_MSG
             if(fh_logger_){spdlog::info("[ff-fh] release success!!\n");}
         }
     }
 
     //PUBLIC-API-03
-    // int ff_reader_action(ffReader* reader, ff_reader_action_info action_info)
-    // {
-
-    // }
+     int ff_file_handler_action(ffFileHandler* reader, ff_file_handler_action_info action_info)
+     {
+         return -1;
+     }
 }

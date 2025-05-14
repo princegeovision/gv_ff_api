@@ -27,7 +27,7 @@ bool ffStreamHandler::handler_cb()
 
 ffStreamHandler::ffStreamHandler()
 {
-
+    m_base_index = 1000;
 }
 
 ffStreamHandler::~ffStreamHandler()
@@ -60,6 +60,27 @@ ffStreamHandler::~ffStreamHandler()
 //     int64_t diff = now_time_t - time_start;
 //     return diff;
 // }
+int32_t ffStreamHandler::insertToMap(ffFileHandler* pfh)
+{
+    int32_t result = 0;
+    //Check if pointer is already in map
+    for (const auto& [key, val] : fh_map) {
+        if(val == pfh){
+            //Exist
+            result = -1;
+        }
+    }
+    if(result == -1){
+        //already Exist
+        return result;
+    } else {
+        //Ready to add to map
+        result = m_base_index;
+        fh_map[m_base_index] = pfh;
+        m_base_index++;
+        return result;//as fh_id
+    }
+}
 void ffStreamHandler::logResult(int result)
 {
     

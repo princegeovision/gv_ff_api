@@ -4,8 +4,10 @@
 //CXX11
 #include <chrono>
 
-#include "ff_file_handler_internal.h"
+#include <map>
 
+#include "ff_file_handler_internal.h"
+#include "ff_file_handler_type.h"
 
 namespace gv
 {
@@ -21,10 +23,12 @@ namespace gv
 
         //void setupTimeStart();
         //int64_t getTimeDiff();
-
+        int32_t insertToMap(ffFileHandler* pfh);
         void logResult(int result);
 
     private:
+        std::map<int32_t, ffFileHandler*> fh_map;
+        int32_t         m_base_index;
         std::time_t     time_start;
     };
     //Note:
