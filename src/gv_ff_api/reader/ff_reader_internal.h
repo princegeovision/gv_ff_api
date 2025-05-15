@@ -58,11 +58,12 @@ typedef struct ffInternalReader
     //boost::thread*              read_thread;
     std::thread*                read_thread;
     
-    bool                        request_stop_read_;
+    bool                        request_stop_read_flag;
     //boost::mutex                request_stop_read_mutex_;
     //boost::condition_variable   request_stop_read_condition_;
     std::mutex                  request_stop_read_mutex_;
     std::condition_variable     request_stop_read_condition_;
+    //std::condition_variable_any request_stop_read_condition_;
     //CXX11
     std::atomic<bool>           request_pause_read_;
     

@@ -10,3 +10,4 @@
 - 1.0.0 : Initial commit
 - 1.1.0 : Add Create and Release function to API.
 - 1.2.0 : add start_action.
+- 1.3.0 : add stop_action support, with stop_flag and lock change.

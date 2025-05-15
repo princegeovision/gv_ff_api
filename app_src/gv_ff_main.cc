@@ -12,8 +12,16 @@ void check_version()
     gv::ff_decoder_version(&tDecoderVersion[0]);
     char tReaderVersion[64] = {0};
     gv::ff_reader_version(&tReaderVersion[0]);
+    char tFileHanderVersion[64] = {0};
+    gv::ff_file_handler_version(&tFileHanderVersion[0]);
 }
-
+//MARK - Callback-File-Handler
+//typedef int(*ff_file_handler_type_callback)(const int cbType, const void* pData, void* user_info);
+int file_handler_callback(const int cbType, const void* pData, void* user_info)
+{
+    spdlog::info("[ff]file_handler_callback>> (cbType={}", cbType);
+    spdlog::info("[ff]file_handler_callback<<");
+}
 //MARK - : Callback-Reader
 //typedef int(*ff_reader_type_callback)(const int cbType, const void* pData, void* user_info);
 int reader_callback(const int cbType, const void* pData, void* user_info)
@@ -104,8 +112,11 @@ void prepare_reader_info(ffReaderConnectionInfo* pInfo)
     pInfo->reader_cb = reader_callback;
     //pInfo->reader_cb_user_arg = this;
 }
-
-void run_reader()
+//This function can take time_interval to automatic stop Reading
+//This will help test action after reading.
+//Note
+// - This function provide auto-stop
+void run_reader_for_seconds(int inputSec)
 {
     ffReader* pReader = nullptr;
     bool bStartReading = false;
@@ -115,7 +126,7 @@ void run_reader()
 
     pReader = gv::ff_reader_create(&info);
 
-
+    int sum_waiting = 0;
     bool bReading = true;
     while(bReading){
         if((pReader != nullptr)&&(bStartReading == false))
@@ -129,9 +140,26 @@ void run_reader()
                 spdlog::info("[ff-reader]action_type_start -- FAIL");
             } else if(action_result == k_ff_reader_action_result_ok){
                 spdlog::info("[ff-reader]action_type_start -- OK");
+                bStartReading = true;
             }
+        } else if(sum_waiting >= inputSec){
+            //Stop
+            ff_reader_action_info action_info;
+            memset(&action_info, 0, sizeof(action_info));
+            action_info.action_type = k_ff_reader_action_type_stop;
+            int action_result = gv::ff_reader_action(pReader, action_info);
+            if(action_result == k_ff_reader_action_result_fail){
+                spdlog::info("[ff-reader]action_type_stop -- FAIL");
+            } else if(action_result == k_ff_reader_action_result_ok){
+                spdlog::info("[ff-reader]action_type_stop -- OK");
+                bReading = false;
+            }
+        } else {
+            spdlog::info("[ff-reader]Read-Loop .....");
         }
-        sleep(1000*100);
+        sleep(1);
+        sum_waiting = sum_waiting + 1;
+        //spdlog::info("[ff-reader]sum_waiting={}", sum_waiting);
         //check reading result
     }
     //After read finished
@@ -139,6 +167,41 @@ void run_reader()
 
 }
 
+void setup_file_name(ffFileHandlerInfo* outputInfo)
+{
+    spdlog::info("[ff-fh]setup_file_name>>");
+    outputInfo->fh_create_type = k_ff_file_handler_create_new_file;
+    std::string file_path("./");
+    //RTSP-Live-01, no filename extension because, it create according to media source.
+    std::string file_name("RTSP-Live-01");
+    std::strcpy(outputInfo->file_path, file_path.c_str());
+    std::strcpy(outputInfo->file_name, file_name.c_str());
+    //Callback
+    outputInfo->fh_cb = file_handler_callback;
+    //outputInfo->fh_cb_user_arg = this;
+    spdlog::info("[ff-fh]setup_file_name({}, {})<<", file_path, file_name);
+
+}
+void prepare_file()
+{
+    spdlog::info("[ff-fh]prepare_file>>");
+    ffFileHandlerInfo fhInfo;
+    memset(&fhInfo, 0, sizeof(fhInfo));
+    setup_file_name(&fhInfo);
+    //output-obj
+    ffFileHandler* pFileHandler = gv::ff_file_handler_create(&fhInfo);
+    if(pFileHandler != nullptr){
+        //create file, we can write data into it
+        spdlog::info("[ff-fh] Stream_file_id : {} !!", pFileHandler->file_stream_id);
+    }
+
+    spdlog::info("[ff-fh]prepare_file<<");
+}
+void release_file()
+{
+    spdlog::info("[ff-fh]release_file>>");
+    spdlog::info("[ff-fh]release_file<<");
+}
 
 int
 main()
@@ -146,8 +209,12 @@ main()
     gv::ff_api_init(nullptr);
     
     check_version();
-    
-    run_reader();
+    //test-case-01
+    prepare_file();
+    //test-case-02
+    run_reader_for_seconds(10);
+
+    release_file();
 
     gv::ff_api_shutdown();
     return 0;

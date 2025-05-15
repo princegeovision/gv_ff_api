@@ -9,6 +9,7 @@
 
 #include "ff_decoder.h"
 #include "ff_reader.h"
+#include "ff_file_handler.h"
 
 namespace gv
 {

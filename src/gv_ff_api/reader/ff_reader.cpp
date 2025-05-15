@@ -24,7 +24,7 @@ namespace gv
 
     void ff_reader_version(char* pVersion)
     {
-        spdlog::info("[ff-reader]version: {}", "1.2.0");
+        spdlog::info("[ff-reader]version: {}", "1.3.0");
         unsigned codecVer = avcodec_version();//"4.4.3#3"
         int ver_major,ver_minor,ver_micro;
         ver_major = (codecVer>>16)&0xff;    //58
@@ -260,7 +260,7 @@ namespace gv
         internal->audio_stream = stream_index_audio;
 
         internal->read_thread = nullptr;
-        internal->request_stop_read_ = false;
+        internal->request_stop_read_flag = false;
         internal->request_pause_read_ = false;
         internal->first_iframe = false;
         internal->serial_num_    = 0;
@@ -300,8 +300,10 @@ namespace gv
             return;
         }
         ffInternalReader* internal = reader->internal;
-        //boost::unique_lock<boost::mutex> request_stop_lock(internal->request_stop_read_mutex_);
-        std::lock_guard<std::mutex> request_stop_lock(reader->internal->request_stop_read_mutex_);
+        //m1 Simplest way to lock a mutex for the duration of a scoped block.
+        //std::lock_guard<std::mutex> request_stop_lock(internal->request_stop_read_mutex_);
+        //m2  More flexible, feature-rich locking mechanism.
+        std::unique_lock<std::mutex> request_stop_lock(internal->request_stop_read_mutex_);
 
         // start a worker to start reading frame
         AVFrame* frame = av_frame_alloc();
@@ -322,8 +324,39 @@ namespace gv
                 got_frame_value = rtsp_get_next_frame(reader, frame);
                 if(reader_logger_){spdlog::info("[RTSP] No Estimate TS(got_frame_value={})\n", got_frame_value);}
             }
+            //k_ff_reader_reader_yet_ready = 0,
+            //k_ff_reader_success_readed = 1,
+            //k_ff_reader_pause_read = 2,
+            //k_ff_reader_read_eof = 3
+            if(internal->request_stop_read_flag == true){
 
-        } while (!internal->request_stop_read_ && (should_continue == true));
+                auto tp_now = std::chrono::system_clock::now();
+                internal->request_stop_read_condition_.wait(request_stop_lock);
+                if(reader_logger_){spdlog::info("[RTSP] success_readed(got_frame_value={})\n", got_frame_value);}
+
+            }
+//            if(got_frame_value  == k_ff_reader_reader_yet_ready) {
+//                
+//                auto tp_now = std::chrono::system_clock::now();
+//                internal->request_stop_read_condition_.wait(request_stop_lock);
+//                if(reader_logger_){spdlog::info("[RTSP] yet_ready(got_frame_value={})\n", got_frame_value);}
+//
+//            } else if(got_frame_value == k_ff_reader_success_readed){
+//
+//                auto tp_now = std::chrono::system_clock::now();
+//                internal->request_stop_read_condition_.wait(request_stop_lock);
+//                if(reader_logger_){spdlog::info("[RTSP] success_readed(got_frame_value={})\n", got_frame_value);}
+//
+//            } else if(got_frame_value == k_ff_reader_pause_read){
+//                //Skip
+//                auto tp = std::chrono::system_clock::now() + std::chrono::milliseconds(100);
+//                //internal->request_stop_read_condition_.wait(request_stop_lock)
+//
+//            } else if(got_frame_value == k_ff_reader_read_eof){
+//                auto tp = std::chrono::system_clock::now() + std::chrono::milliseconds(2000);
+//            }
+
+        } while (!internal->request_stop_read_flag && (should_continue == true));
 
         av_frame_free(&frame);
     }
@@ -670,7 +703,7 @@ namespace gv
 
                 av_packet_free(&packet);
             }
-        } while (read_next && !reader->internal->request_stop_read_);
+        } while (read_next && !reader->internal->request_stop_read_flag);
 
         return ret_value;
     }
@@ -682,9 +715,38 @@ namespace gv
         {
             return false;
         }
-        std::lock_guard<std::mutex> lock(reader->internal->request_stop_read_mutex_);
-        reader->internal->read_thread = new std::thread(std::bind(start_read_rtsp_stream, reader));
+        {
+            std::lock_guard<std::mutex> lock(reader->internal->request_stop_read_mutex_);
+            reader->internal->read_thread = new std::thread(std::bind(start_read_rtsp_stream, reader));
+        }
+        return true;
+    }
+    bool reader_stop(ffReader* reader)
+    {
+        if (!reader || !reader->internal || !reader->internal->read_thread)
+        {
+            return false;
+        }
+        {
+            //Note:
+            // - This part is not the same as org-design
+            // - We find std::cv and mutex work differently
+            // - In order to get lock and notify and delete reading thread
+            // - we need to set flag to make thread inside wait for us.
+            reader->internal->request_stop_read_flag = true;
+            reader->internal->request_pause_read_ = false;
+            std::lock_guard<std::mutex> lock(reader->internal->request_stop_read_mutex_);
 
+
+        }
+        reader->internal->request_stop_read_condition_.notify_all();
+        reader->internal->read_thread->join();
+        delete reader->internal->read_thread;
+        reader->internal->read_thread = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(reader->internal->request_stop_read_mutex_);
+            reader->internal->request_stop_read_flag = false;
+        }
         return true;
     }
     //PUBLIC-API-01
@@ -745,6 +807,12 @@ namespace gv
             case k_ff_reader_action_type_stop:
             {
                 if(reader_logger_){FF_RELEASE_MSG("[ACTION]-Stop\n");}
+                bool stop_result = reader_stop(reader);
+                if(stop_result == true){
+                    action_result = k_ff_reader_action_result_ok;
+                } else {
+                    action_result = k_ff_reader_action_result_fail;
+                }
             }
                 break;
             default:
