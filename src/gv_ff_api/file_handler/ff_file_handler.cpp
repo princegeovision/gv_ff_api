@@ -21,7 +21,7 @@ namespace gv
     //void ff_reader_version(char* pVersion)
     void ff_file_handler_version(char* pVersion)
     {
-        spdlog::info("[ff-fh]version: {}", "0.2.0");
+        spdlog::info("[ff-fh]version: {}", "0.3.0");
         unsigned codecVer = avcodec_version();//"4.4.3#3"
         int ver_major,ver_minor,ver_micro;
         ver_major = (codecVer>>16)&0xff;    //58
@@ -62,7 +62,7 @@ namespace gv
                 return nullptr;
             }
             gv::stream_file_mgr* stream_mgr = new gv::stream_file_mgr();
-            bool ok = stream_mgr->init(std::string(l_file_name));
+            bool ok = stream_mgr->init(std::string(l_file_name), inputInfo->file_support_audio);
             if (!ok)
             {
                 delete stream_mgr;

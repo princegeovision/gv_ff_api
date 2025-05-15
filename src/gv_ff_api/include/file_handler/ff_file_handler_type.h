@@ -44,7 +44,7 @@ typedef struct ffFileHandlerInfo
     char    file_name[512];     /*!<  ref: xxx.xxx.xxx.xxx ipv4*/
     char    file_path[1024];    /*!<  ref: xxx.sdp (file path)*/
     //int64_t file_stream_id;     //pre-define, if library can respect this?
-    
+    bool    file_support_audio;
     //Callback Related
     ff_file_handler_type_callback   fh_cb;
     void*                           fh_cb_user_arg;

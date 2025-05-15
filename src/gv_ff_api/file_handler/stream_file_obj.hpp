@@ -80,6 +80,7 @@ namespace gv
                 return false;
             }
         }
+        void shutdown();
         //void logResult(int result);
 
     private:

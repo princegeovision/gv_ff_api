@@ -46,6 +46,10 @@ stream_file_obj::~stream_file_obj()
         if(b_sfo_log_){spdlog::info("[ff-stream_file_obj]<Destructor>closed: {}", filename);}
     }
 }
+void stream_file_obj::shutdown()
+{
+    if(b_sfo_log_){spdlog::info("[ff-stream_file_obj]shutdown>><<", filename);}
+}
 
 
 }//end of namespace gv

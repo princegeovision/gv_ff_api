@@ -26,13 +26,16 @@ namespace gv
         stream_file_mgr();
         virtual ~stream_file_mgr();
 
-        bool init(std::string file_path);
+        bool init(std::string file_path, bool support_audio);
+        void shutdown();
         void logResult(int result);
 
     private:
-        stream_file_obj* m_video_sfo_;
-        bool            b_sfm_log_;
-        std::time_t     time_start;
+        std::string         m_file_path_;
+        stream_file_obj*    m_video_sfo_;
+        stream_file_obj*    m_audio_sfo_;
+        bool                b_sfm_log_;
+        std::time_t         time_start;
     };
 
 };//end of namespace gv

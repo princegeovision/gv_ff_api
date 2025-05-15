@@ -24,6 +24,7 @@
 
 #### Version
 
+- 0.3.0 : support stream_file_obj , init and shutdown with audio file support.
 - 0.2.0 : add 3 major class
   - ffStreamHandler : global storage
   - stream_file_mgr : file operation class
