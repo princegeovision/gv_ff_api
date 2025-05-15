@@ -116,7 +116,7 @@ void prepare_reader_info(ffReaderConnectionInfo* pInfo)
 //This will help test action after reading.
 //Note
 // - This function provide auto-stop
-void run_reader()
+void run_reader_for_seconds(int inputSec)
 {
     ffReader* pReader = nullptr;
     bool bStartReading = false;
@@ -126,7 +126,7 @@ void run_reader()
 
     pReader = gv::ff_reader_create(&info);
 
-
+    int sum_waiting = 0;
     bool bReading = true;
     while(bReading){
         if((pReader != nullptr)&&(bStartReading == false))
@@ -142,10 +142,24 @@ void run_reader()
                 spdlog::info("[ff-reader]action_type_start -- OK");
                 bStartReading = true;
             }
+        } else if(sum_waiting >= inputSec){
+            //Stop
+            ff_reader_action_info action_info;
+            memset(&action_info, 0, sizeof(action_info));
+            action_info.action_type = k_ff_reader_action_type_stop;
+            int action_result = gv::ff_reader_action(pReader, action_info);
+            if(action_result == k_ff_reader_action_result_fail){
+                spdlog::info("[ff-reader]action_type_stop -- FAIL");
+            } else if(action_result == k_ff_reader_action_result_ok){
+                spdlog::info("[ff-reader]action_type_stop -- OK");
+                bReading = false;
+            }
         } else {
             spdlog::info("[ff-reader]Read-Loop .....");
         }
-        sleep(1000*100);
+        sleep(1);
+        sum_waiting = sum_waiting + 1;
+        //spdlog::info("[ff-reader]sum_waiting={}", sum_waiting);
         //check reading result
     }
     //After read finished
@@ -198,7 +212,7 @@ main()
     //test-case-01
     prepare_file();
     //test-case-02
-    run_reader();
+    run_reader_for_seconds(10);
 
     release_file();
 
