@@ -34,6 +34,13 @@ enum ff_file_handler_action_type
     k_ff_file_handler_action_type_read                = 101,
 };
 
+enum ff_file_handler_detail_type
+{
+    k_ff_file_handler_detail_type_unknown             = 0,
+    k_ff_file_handler_detail_type_video               = 200,
+    k_ff_file_handler_detail_type_audio                = 201,
+};
+
 // << Callback DEF >>
 typedef int(*ff_file_handler_type_callback)(const int cbType, const void* pData, void* user_info);
 
@@ -61,8 +68,9 @@ typedef struct ff_file_handler_action_info
 {
     enum ff_file_handler_action_type    action_type;
     bool                                b_flag;
-    int32_t                             n_value;
-    const char*                         s_detail;
+    //int32_t                             n_value;
+    enum ff_file_handler_detail_type    detail_type;
+    void*                               p_detail;
 } ff_file_handler_action_info;
 
 //Reader

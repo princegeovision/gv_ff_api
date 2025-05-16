@@ -15,14 +15,18 @@ void check_version()
     char tFileHanderVersion[64] = {0};
     gv::ff_file_handler_version(&tFileHanderVersion[0]);
 }
-//MARK - Callback-File-Handler
+//Forward-Declaration
+void write_data_to_file(ffReaderVideoInfo* videoInfo);
+
+
+//MARK: - Callback-File-Handler
 //typedef int(*ff_file_handler_type_callback)(const int cbType, const void* pData, void* user_info);
 int file_handler_callback(const int cbType, const void* pData, void* user_info)
 {
     spdlog::info("[ff]file_handler_callback>> (cbType={}", cbType);
     spdlog::info("[ff]file_handler_callback<<");
 }
-//MARK - : Callback-Reader
+//MARK: - Callback-Reader
 //typedef int(*ff_reader_type_callback)(const int cbType, const void* pData, void* user_info);
 int reader_callback(const int cbType, const void* pData, void* user_info)
 {
@@ -33,6 +37,7 @@ int reader_callback(const int cbType, const void* pData, void* user_info)
         {
             ffReaderVideoInfo* videoInfo = (ffReaderVideoInfo*)pData;
             spdlog::info("[V]-{} x {}", videoInfo->width, videoInfo->height);
+            write_data_to_file(videoInfo);
         }
             break;
         case k_ff_reader_callback_type_audio_data:
@@ -58,7 +63,8 @@ int reader_callback(const int cbType, const void* pData, void* user_info)
     }
     spdlog::info("[ff]reader_callback<<");
 }
-//Utils-Func
+//MARK: - Utils-Func
+
 std::string charToHex(unsigned char c) {
     short i = c;
 
@@ -68,7 +74,7 @@ std::string charToHex(unsigned char c) {
 
     return s.str();
 }
-//Utils-Func
+
 std::string urlEncode(const std::string &toEncode) {
     std::ostringstream out;
 
@@ -91,7 +97,7 @@ std::string urlEncode(const std::string &toEncode) {
 
     return out.str();
 }
-
+//MARK: - Reader
 void prepare_reader_info(ffReaderConnectionInfo* pInfo)
 {
     //EX: rtsp://admin:Admin123%21@192.168.4.123:554/unicast/c31/s0/live
@@ -167,6 +173,23 @@ void run_reader_for_seconds(int inputSec)
 
 }
 
+//MARK: - File Related
+ffFileHandler* gFileHandler = nullptr;
+
+void write_data_to_file(ffReaderVideoInfo* videoInfo)
+{
+    spdlog::info("[ff]write_data_to_file>>");
+    //gFileHandler
+    spdlog::info("[ff] cbType={}", videoInfo->codec_type);
+    ff_file_handler_action_info write_info;
+    memset(&write_info, 0, sizeof(ff_file_handler_action_info));
+    write_info.action_type = k_ff_file_handler_action_type_write;
+    write_info.detail_type = k_ff_file_handler_detail_type_video;
+    write_info.p_detail = (void*)videoInfo;
+    int action_result =  gv::ff_file_handler_action(gFileHandler, write_info);
+
+    spdlog::info("[ff]write_data_to_file<<");
+}
 void setup_file_name(ffFileHandlerInfo* outputInfo)
 {
     spdlog::info("[ff-fh]setup_file_name>>");
@@ -189,10 +212,11 @@ void prepare_file()
     memset(&fhInfo, 0, sizeof(fhInfo));
     setup_file_name(&fhInfo);
     //output-obj
-    ffFileHandler* pFileHandler = gv::ff_file_handler_create(&fhInfo);
-    if(pFileHandler != nullptr){
+    //ffFileHandler* pFileHandler = gv::ff_file_handler_create(&fhInfo);
+    gFileHandler = gv::ff_file_handler_create(&fhInfo);
+    if(gFileHandler != nullptr){
         //create file, we can write data into it
-        spdlog::info("[ff-fh] Stream_file_id : {} !!", pFileHandler->file_stream_id);
+        spdlog::info("[ff-fh] Stream_file_id : {} !!", gFileHandler->file_stream_id);
     }
 
     spdlog::info("[ff-fh]prepare_file<<");
@@ -203,6 +227,7 @@ void release_file()
     spdlog::info("[ff-fh]release_file<<");
 }
 
+//MARK: - Main
 int
 main()
 {
