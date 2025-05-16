@@ -126,14 +126,33 @@ enum ff_reader_action_result
     k_ff_reader_action_result_fail = 10
     //k_ff_reader_action_result_start_fail = 11,
 };
+enum ff_reader_codec_type
+{
+    k_ff_reader_codec_type_unknonw = 0,
+    // AV_CODEC_ID_MPEG4:
+    // AV_CODEC_ID_MSMPEG4V1:
+    // AV_CODEC_ID_MSMPEG4V2:
+    // AV_CODEC_ID_MSMPEG4V3:
+    k_ff_reader_codec_type_mp4 = 1001,
+    // AV_CODEC_ID_MJPEG:
+    // AV_CODEC_ID_LJPEG:
+    // AV_CODEC_ID_JPEGLS:
+    // AV_CODEC_ID_JPEG2000:
+    k_ff_reader_codec_type_jpg = 1002,
+    // AV_CODEC_ID_H264
+    k_ff_reader_codec_type_264 = 1003,
+    // AV_CODEC_ID_HEVC
+    k_ff_reader_codec_type_hevc = 1004,
+};
 
 //This should be class for RAII Reason.
 typedef struct ffReaderVideoInfo
 {
     int32_t     codec_type;         ///< gvAvFileReaderVideoType
+    int32_t     ff_codec_type;
     uint8_t*    raw_data;           /*!< video packet data. encoded data.*/
     int32_t     raw_data_size;      /*!< video packet data size.*/
-    uint8_t*    extra_data;
+    uint8_t*    extra_data;         /*!< AVCodecContext Binary Data*/
     int32_t     extra_data_size;
     int32_t     width;              /*!< picture width*/
     int32_t     height;             /*!< picture height*/

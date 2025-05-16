@@ -303,6 +303,7 @@ namespace gv
         //m1 Simplest way to lock a mutex for the duration of a scoped block.
         //std::lock_guard<std::mutex> request_stop_lock(internal->request_stop_read_mutex_);
         //m2  More flexible, feature-rich locking mechanism.
+        //condition_variable only work with "unique_lock", [ref](https://kheresy.wordpress.com/2014/01/09/c11-condition-variable/)
         std::unique_lock<std::mutex> request_stop_lock(internal->request_stop_read_mutex_);
 
         // start a worker to start reading frame
@@ -384,6 +385,35 @@ namespace gv
                 break;
             case AV_CODEC_ID_HEVC:
                 codec_type = MAKEFOURCC('G', 'H', 'E', 'C') ;
+                break;
+            default:
+                codec_type = 0;
+        }
+
+        return codec_type;
+    }
+    int32_t rtsp_convert_ff_codec_type(const AVCodecID ffmpeg_codec_id)
+    {
+        unsigned int codec_type = 0;
+        switch (ffmpeg_codec_id)
+        {
+            case AV_CODEC_ID_MPEG4:
+            case AV_CODEC_ID_MSMPEG4V1:
+            case AV_CODEC_ID_MSMPEG4V2:
+            case AV_CODEC_ID_MSMPEG4V3:
+                codec_type = k_ff_reader_codec_type_mp4;
+                break;
+            case AV_CODEC_ID_MJPEG:
+            case AV_CODEC_ID_LJPEG:
+            case AV_CODEC_ID_JPEGLS:
+            case AV_CODEC_ID_JPEG2000:
+                codec_type = k_ff_reader_codec_type_jpg;
+                break;
+            case AV_CODEC_ID_H264:
+                codec_type = k_ff_reader_codec_type_264;
+                break;
+            case AV_CODEC_ID_HEVC:
+                codec_type = k_ff_reader_codec_type_hevc;
                 break;
             default:
                 codec_type = 0;
@@ -635,6 +665,7 @@ namespace gv
                                                           info.video_time_minute, \
                                                           info.video_time_second );}
                         info.codec_type = rtsp_convert_codec_type(codec_ctx->codec_id);
+                        info.ff_codec_type = rtsp_convert_ff_codec_type(codec_ctx->codec_id);
                         info.width = codec_ctx->width;
                         info.height = codec_ctx->height;
                         info.key_frame = (AV_PKT_FLAG_KEY == (packet->flags & AV_PKT_FLAG_KEY));

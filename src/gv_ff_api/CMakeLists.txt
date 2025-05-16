@@ -8,6 +8,7 @@ add_library(gv_ff_api
     file_handler/ff_file_handler.cpp
     file_handler/stream_handler.cpp
     file_handler/stream_file_obj.cpp
+    file_handler/stream_feature_strategy.cpp
     file_handler/stream_file_mgr.cpp)
 # ff_decoder.cc
 
@@ -30,6 +31,7 @@ target_sources(gv_ff_api
     include/file_handler/ff_file_handler_type.h
     file_handler/stream_handler.hpp
     file_handler/stream_file_obj.hpp
+    file_handler/stream_feature_strategy.hpp
     file_handler/stream_file_mgr.hpp
     file_handler/ff_file_handler_internal.h)
 

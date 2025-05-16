@@ -2,8 +2,10 @@
 #include <iomanip> //std::put_time
 #include <sstream> //std::stringstream
 
-#include "ff_file_handler.h"
+//From Reader (A.K.A. network)
+#include "ff_reader_type.h"
 
+#include "ff_file_handler.h"
 #include "ff_file_handler_internal.h"
 
 #include "stream_handler.hpp"
@@ -111,8 +113,36 @@ namespace gv
     }
 
     //PUBLIC-API-03
-     int ff_file_handler_action(ffFileHandler* reader, ff_file_handler_action_info action_info)
+     int ff_file_handler_action(ffFileHandler* fHandler, ff_file_handler_action_info action_info)
      {
+         if (!fHandler || !fHandler->internal || !fHandler->internal->p_fmgr)
+         {
+             return -1;
+         }
+         gv::stream_file_mgr* pMgr = fHandler->internal->p_fmgr;
+         switch (action_info.action_type) {
+             case k_ff_file_handler_action_type_write:
+             {
+                 if(fh_logger_){spdlog::info("[ff-fh] k_ff_file_handler_action_type_write\n");}
+                 bool write_result = pMgr->write_info(action_info);
+                 if(fh_logger_){spdlog::info("[ff-fh] write_result= {}\n", write_result);}
+             }
+                 break;
+             case k_ff_file_handler_action_type_read:
+             {
+                 if(fh_logger_){spdlog::info("[ff-fh] k_ff_file_handler_action_type_read <Not Implement>\n");}
+             }
+                 break;
+
+             default:
+             {
+                 if(fh_logger_){spdlog::info("[ff-fh] k_ff_file_handler_action_type_unknown <Not Implement>\n");}
+             }
+                 break;
+         }
+
+         //Check
+         //pMgr->
          return -1;
      }
 }

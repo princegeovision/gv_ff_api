@@ -27,9 +27,18 @@ namespace gv
     class stream_file_obj
     {
     private:
-        std::fstream file;
+        //Note
+        // - use std::ofstream when write only
+        std::fstream file;//enable to read and write
         std::string filename;
+        std::ios::openmode file_mode;
         bool b_sfo_log_;
+        //Note
+        // - 0: initial
+        // - 1: open-ok
+        // - 2: open-fail
+        // - 3: closed
+        int32_t     file_status;
     public:
         static bool handler_cb();
     public:
@@ -40,7 +49,7 @@ namespace gv
         //b5-Copy Constructor
         stream_file_obj(const stream_file_obj& other) : filename(other.filename)
         {
-            file.open(filename, std::ios::in | std::ios::out);
+            file.open(filename, std::ios::in | std::ios::out );
             if(b_sfo_log_){spdlog::info("[ff-stream_file_obj]<Copy Constructor>Coped file: {}", filename);}
         }
         //b5-Copy Assignment Operator
@@ -49,7 +58,7 @@ namespace gv
             if (this != &other) {
                 if (file.is_open()) file.close();
                 filename = other.filename;
-                file.open(filename, std::ios::in | std::ios::out);
+                file.open(filename, std::ios::in | std::ios::out );
                 if(b_sfo_log_){spdlog::info("[ff-stream_file_obj]<Copy Assignment>Coped file: {}", filename);}
             }
             return *this;
@@ -80,6 +89,7 @@ namespace gv
                 return false;
             }
         }
+        bool write_string(std::string inputStr);
         void shutdown();
         //void logResult(int result);
 

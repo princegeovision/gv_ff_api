@@ -47,7 +47,7 @@ ffFileHandler* ff_file_handler_create(ffFileHandlerInfo* inputInfo);
 void ff_file_handler_release(ffFileHandler** fHandler);
 
 //int ff_reader_action(ffReader* reader, ff_reader_action_info action_info);
-int ff_file_handler_action(ffFileHandler* reader, \
+int ff_file_handler_action(ffFileHandler* fHandler, \
                            ff_file_handler_action_info action_info);
 
 }
