@@ -24,6 +24,7 @@
 
 #### Version
 
+- 0.4.0 : support header file for stream file beginning, (plain-text JSON with Base64 encode)
 - 0.3.0 : support stream_file_obj , init and shutdown with audio file support.
 - 0.2.0 : add 3 major class
   - ffStreamHandler : global storage
